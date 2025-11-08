@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documento de visão</title>
+</head>
+<body>
+    <input type="number" name="number" id="number" id="number">
+    <button id="btn">Clique-me</button>
+    <p id="demo">0H:0M:0S</p>
+
+    <form action="/tempo-pomo/" method="post">
+        {% csrf_token %}
+        {{form.as_p}}
+        <input type="submit" value="Submit">
+
+    </form>
+
+
+    {% for i in tempo %}
+    <p>{{i.tempoAtivo}}</p>
+    {% endfor %}
+
+    <script>
+        var btn = document.getElementById("btn")
+        var demo = document.getElementById("demo")
+        var x
+
+        btn.addEventListener('click', ()=>{
+
+            if(x){
+                clearInterval(x)
+            }
+
+            var number = document.getElementById('number').value
+            var future = new Date().getTime() + (number*60*1000)
+            
+            x = setInterval(()=>{
+                var now = new Date().getTime() - (2000)
+                var tempo = future - now
+
+                var hours = Math.floor((tempo % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((tempo % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((tempo % (1000 * 60)) / 1000);
+
+                demo.innerHTML = `${hours}H:${minutes}M:${seconds}S`
+                console.log(`${hours}H:${minutes}M:${seconds}S`)
+
+                if (tempo<0){
+                    clearInterval(x)
+                    demo.innerHTML = "Já era bot."
+                }
+            }, 1000)  
+        })
+    </script>
+</body>
+</html>
