@@ -6,7 +6,14 @@ from .forms import tempoPomo
 def index(request):
     tempo = Tempozika.objects.all()
     form = tempoPomo()
-    context = {'tempo':tempo,'form':form}
+
+    tempo_salvo = Tempozika.objects.last()
+    tempo_padrao = 25
+
+    if tempo_salvo:
+        tempo_padrao = tempo_salvo.tempoAtivo
+
+    context = {'tempo':tempo,'form':form,'tempo_timer':tempo_padrao}
     return render(request, "timer/index.html", context)
 
 
