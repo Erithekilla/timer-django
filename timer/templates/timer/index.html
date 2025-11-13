@@ -14,21 +14,29 @@
     </form>
 
     <h2>Timer</h2>
+    <p id="rora"></p>
     <p id="demo">{{tempo_timer}}</p>
     <button id="btn">Clique</button>
 
     
 
-
+    <p>Tempo Ativo</p>
     {% for i in tempo %}
     <p>{{i.tempoAtivo}}</p>
+    {% endfor %}
+    <p>Tempo Descanso</p>
+    {% for i in tempo %}
+    <p>{{i.tempoDesc}}</p>
     {% endfor %}
 
     <script>
         var btn = document.getElementById("btn")
         var demo = document.getElementById("demo")
+        var rest_or_action = document.getElementById("rora")
+        var ciclo = true
         var x
         var tempo_django = {{ tempo_timer }}
+        var descanso_django = {{ tempo_desc }}
 
         btn.addEventListener('click', ()=>{
 
@@ -47,26 +55,53 @@
                 number2 = 25
             }
 
-            var future = new Date().getTime() + (number2*60*1000)
+            var number_rest = parseInt(document.getElementById('id_tempoDesc').value)
+
+
+            var future = number2 * 60
+            var rest = number_rest*60
             
             x = setInterval(()=>{
-                var now = new Date().getTime()
-                var tempo = future - now
+                if(ciclo){
+                    rest_or_action.innerHTML = "Ativo!"
 
-                var hours = Math.floor((tempo % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                var minutes = Math.floor((tempo % (1000 * 60 * 60)) / (1000 * 60));
-                var seconds = Math.floor((tempo % (1000 * 60)) / 1000);
+                    var hours = Math.floor(future / 3600);
+                    var minutes = Math.floor((future % 3600) /60);
+                    var seconds = Math.floor(future % 60);
 
-                minutes = String(minutes).padStart(2,'0')
-                seconds = String(seconds).padStart(2,'0')
+                    minutes = String(minutes).padStart(2,'0')
+                    seconds = String(seconds).padStart(2,'0')
 
-                demo.innerHTML = `${hours}H:${minutes}M:${seconds}S`
-                console.log(`${hours}H:${minutes}M:${seconds}S`)
+                    demo.innerHTML = `${hours}H:${minutes}M:${seconds}S`
+                    console.log(`${hours}H:${minutes}M:${seconds}S`)
+                    
+                    if (future<0){
+                        ciclo = false
+                        rest = 5*60
+                    }
+                    future--
+                    
+                } else {
+                    rest_or_action.innerHTML = "Descanso!"
 
-                if (tempo<0){
-                    clearInterval(x)
-                    demo.innerHTML = "Já era bot."
+                    var hours = Math.floor(rest /3600);
+                    var minutes = Math.floor((rest % 3600) /60);
+                    var seconds = Math.floor(rest % 60);
+
+                    minutes = String(minutes).padStart(2,'0')
+                    seconds = String(seconds).padStart(2,'0')
+
+                    demo.innerHTML = `${hours}H:${minutes}M:${seconds}S`
+                    console.log(`${hours}H:${minutes}M:${seconds}S`)
+                    
+                    if (rest<0){
+                        ciclo = true
+                        future = number2 * 60
+                    }
+                    rest--
+                    
                 }
+                    
             }, 1000)  
         })
     </script>
